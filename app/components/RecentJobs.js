@@ -9,24 +9,31 @@ export default function RecentJobs() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
 
-  useEffect(() => {
-    async function fetchJobs() {
-      try {
-        setIsLoading(true)
-        const response = await fetch('/api/recent-jobs')
-        if (!response.ok) {
-          throw new Error('Failed to fetch recent jobs')
+  const fetchJobs = async (retries = 3) => {
+    try {
+      setIsLoading(true)
+      const response = await fetch('/api/recent-jobs')
+      if (!response.ok) {
+        if (response.status >= 500 && retries > 0) {
+          console.warn(`Retrying fetch due to server error: ${response.status}`)
+          setTimeout(() => fetchJobs(retries - 1), 1000)
+          return
         }
-        const data = await response.json()
-        setJobs(data)
-      } catch (error) {
-        console.error('Error fetching recent jobs:', error)
-        setError('Failed to load recent jobs. Please try again later.')
-      } finally {
-        setIsLoading(false)
+        throw new Error(`Failed to fetch recent jobs: ${response.status} ${response.statusText}`)
       }
+      const data = await response.json()
+      setJobs(data)
+      setError(null)
+    } catch (error) {
+      console.error('Error fetching recent jobs:', error.message)
+      setError('Failed to load recent jobs. Please try again later.')
+      setJobs([])
+    } finally {
+      setIsLoading(false)
     }
+  }
 
+  useEffect(() => {
     fetchJobs()
   }, [])
 

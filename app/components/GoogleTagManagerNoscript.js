@@ -15,7 +15,9 @@ export default function GoogleTagManagerNoscript() {
     document.body.appendChild(noscript)
 
     return () => {
-      document.body.removeChild(noscript)
+      if (document.body.contains(noscript)) {
+        document.body.removeChild(noscript)
+      }
     }
   }, [])
 
