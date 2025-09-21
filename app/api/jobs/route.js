@@ -45,7 +45,8 @@ export async function GET(request) {
       totalPages: Math.ceil(totalJobs / limit)
     })
   } catch (error) {
-    console.error('Error in GET /api/jobs:', error)
+    console.error('Error in GET /api/jobs:', error.message)
+    console.error('Stack:', error.stack)
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
   }
 }

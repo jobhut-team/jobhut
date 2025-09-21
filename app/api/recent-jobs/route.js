@@ -22,7 +22,8 @@ export async function GET() {
 
     return NextResponse.json(serializedJobs)
   } catch (error) {
-    console.error('Error in recent-jobs API:', error)
+    console.error('Error in recent-jobs API:', error.message)
+    console.error('Stack:', error.stack)
     return NextResponse.json({ error: 'Failed to fetch recent jobs' }, { status: 500 })
   }
 }
